@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Plus } from "lucide-react"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Pagination,
@@ -25,34 +26,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
+import { SectionHeader } from "@/components/SectionHeader"
 import { TaskForm } from "@/components/TaskForm"
 import { formatDate } from "@/lib/date"
 import { useDashboard } from "@/lib/store"
+import { priorityTone, taskStatusTone } from "@/lib/ui"
+import { cn } from "@/lib/utils"
 import type { Task } from "@/lib/types"
-
-const statusVariant = (status: string) => {
-  switch (status) {
-    case "Completado":
-      return "default"
-    case "En progreso":
-      return "secondary"
-    default:
-      return "outline"
-  }
-}
-
-const priorityVariant = (priority: string) => {
-  switch (priority) {
-    case "Urgente":
-      return "destructive"
-    case "Alta":
-      return "default"
-    case "Media":
-      return "secondary"
-    default:
-      return "outline"
-  }
-}
 
 // Páginas a mostrar: primera, última y las cercanas a la actual, con "..." en los saltos.
 function pageItems(current: number, total: number): (number | "gap-start" | "gap-end")[] {
@@ -91,44 +71,48 @@ export function TasksTable() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button onClick={() => setCreating(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nueva Tarea
-        </Button>
-      </div>
+    <>
+      <SectionHeader
+        title={`${tasks.length} ${tasks.length === 1 ? "tarea" : "tareas"}`}
+        description="Marca lo terminado con el círculo; edita o elimina desde cada fila."
+        action={
+          <Button onClick={() => setCreating(true)}>
+            <Plus className="size-4" />
+            Nueva tarea
+          </Button>
+        }
+      />
 
-      <div className="rounded-md border">
+      <Card className="animate-tile gap-0 overflow-hidden p-0">
         <Table>
-          <TableCaption>
+          <TableCaption className="mt-0 border-t border-hairline py-3 text-[13px]">
             Mostrando {visible.length} de {tasks.length} tareas
           </TableCaption>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">Hecha</TableHead>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-14 pl-6">Hecha</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead>Proyecto</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Prioridad</TableHead>
               <TableHead>Asignado a</TableHead>
               <TableHead>Fecha límite</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className="pr-6 text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {visible.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
                   No hay tareas registradas.
                 </TableCell>
               </TableRow>
             )}
             {visible.map((task) => (
               <TableRow key={task.id}>
-                <TableCell>
+                <TableCell className="pl-6">
                   {togglingId === task.id ? (
-                    <Spinner />
+                    <Spinner className="size-[22px] text-primary" />
                   ) : (
                     <Checkbox
                       aria-label={`Marcar "${task.description}" como completada`}
@@ -137,38 +121,51 @@ export function TasksTable() {
                     />
                   )}
                 </TableCell>
-                <TableCell className="font-medium">{task.description}</TableCell>
-                <TableCell>{projectName(task.projectId)}</TableCell>
+                <TableCell
+                  className={cn(
+                    "text-[15px] font-medium transition-colors",
+                    task.status === "Completado" && "text-muted-foreground line-through decoration-muted-foreground/40"
+                  )}
+                >
+                  {task.description}
+                </TableCell>
+                <TableCell className="text-[15px] text-muted-foreground">{projectName(task.projectId)}</TableCell>
                 <TableCell>
-                  <Badge variant={statusVariant(task.status)}>{task.status}</Badge>
+                  <Badge variant={taskStatusTone[task.status]}>{task.status}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={priorityVariant(task.priority)}>{task.priority}</Badge>
+                  <Badge variant={priorityTone[task.priority]}>{task.priority}</Badge>
                 </TableCell>
-                <TableCell>{memberName(task.userId)}</TableCell>
-                <TableCell>{formatDate(task.dateline)}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => setEditing(task)}>
-                    Editar
+                <TableCell className="text-[15px]">{memberName(task.userId)}</TableCell>
+                <TableCell className="text-[15px] text-muted-foreground">{formatDate(task.dateline)}</TableCell>
+                <TableCell className="pr-6 text-right">
+                  <Button size="icon-sm" variant="ghost" aria-label="Editar tarea" onClick={() => setEditing(task)}>
+                    <Pencil className="size-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setRemoving(task)}>
-                    Eliminar
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    aria-label="Eliminar tarea"
+                    onClick={() => setRemoving(task)}
+                  >
+                    <Trash2 className="size-4" />
                   </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Card>
 
       {totalPages > 1 && (
-        <Pagination>
+        <Pagination className="mt-6">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
                 href="#"
                 aria-disabled={current === 1}
-                className={current === 1 ? "pointer-events-none opacity-50" : ""}
+                className={current === 1 ? "pointer-events-none opacity-40" : ""}
                 onClick={(e) => {
                   e.preventDefault()
                   setPage(current - 1)
@@ -199,7 +196,7 @@ export function TasksTable() {
               <PaginationNext
                 href="#"
                 aria-disabled={current === totalPages}
-                className={current === totalPages ? "pointer-events-none opacity-50" : ""}
+                className={current === totalPages ? "pointer-events-none opacity-40" : ""}
                 onClick={(e) => {
                   e.preventDefault()
                   setPage(current + 1)
@@ -215,10 +212,10 @@ export function TasksTable() {
       <ConfirmDialog
         open={removing !== null}
         onOpenChange={(open) => !open && setRemoving(null)}
-        title="Eliminar tarea"
-        description={`Se eliminará la tarea "${removing?.description}". Esta acción no se puede deshacer.`}
+        title="¿Eliminar tarea?"
+        description={`"${removing?.description}" se eliminará. No se puede deshacer.`}
         onConfirm={() => deleteTask(removing!.id)}
       />
-    </div>
+    </>
   )
 }
