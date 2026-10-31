@@ -58,6 +58,16 @@ Componentes de shadcn/ui usados: button, card, input, textarea, label, dialog, t
 
 Reglas de datos: un miembro pertenece a un solo proyecto; al eliminar un proyecto se borran sus tareas y sus miembros quedan sin proyecto; al eliminar un miembro sus tareas quedan sin asignar. "Tareas por página" de Configuración controla la paginación de Tareas.
 
+## Diseño
+
+Inspirado en el lenguaje visual de Apple (ver `src/app/globals.css`):
+
+- **Tipografía:** pila del sistema (`-apple-system` / SF Pro) con Inter como respaldo; títulos grandes con tracking negativo.
+- **Color:** fondo gris `#f5f5f7`, tarjetas blancas sin bordes, azul `#0071e3` como acento y modo oscuro automático (`prefers-color-scheme`).
+- **Materiales:** barra superior translúcida con `backdrop-filter` y diálogos de vidrio sobre un fondo atenuado.
+- **Componentes:** botones en píldora con efecto de presión, badges suaves, campos rellenos, switch estilo iOS y control segmentado cuya píldora se desliza entre secciones.
+- **Movimiento:** solo `transform` y `opacity`, curvas `cubic-bezier(0.32, 0.72, 0, 1)`, animaciones menores a 450 ms y soporte de `prefers-reduced-motion` y `prefers-reduced-transparency`.
+
 ## Desviaciones respecto al enunciado
 
 - El enunciado muestra `TaskTable`/`ProjectForm` con datos fijos; se reemplazaron por versiones conectadas al estado en memoria para cumplir la TAREA.
