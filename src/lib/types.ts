@@ -44,7 +44,7 @@ export interface Task {
 export interface Activity {
   id: string
   text: string
-  time: number
+  time: string // hora (HH:mm) en que ocurrió la acción
 }
 
 export interface Settings {

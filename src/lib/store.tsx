@@ -17,7 +17,7 @@ interface Metrics {
   completedTasks: number
   totalTasks: number
   pendingTasks: number
-  overdueTasks: number
+  urgentTasks: number
   activeMembers: number
   totalMembers: number
 }
@@ -50,14 +50,15 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState(seedTasks)
   const [settings, setSettings] = useState(seedSettings)
   const [activity, setActivity] = useState<Activity[]>([
-    { id: "a0", text: "Se cargaron los datos de ejemplo", time: Date.now() },
+    { id: "a0", text: "Se cargaron los datos de ejemplo", time: "Inicio" },
   ])
   const counter = useRef(100)
 
   const newId = (prefix: string) => `${prefix}${counter.current++}`
 
   const log = useCallback((text: string) => {
-    setActivity((prev) => [{ id: `a${counter.current++}`, text, time: Date.now() }, ...prev].slice(0, 8))
+    const time = new Date().toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })
+    setActivity((prev) => [{ id: `a${counter.current++}`, text, time }, ...prev].slice(0, 8))
   }, [])
 
   // La relación proyecto-miembro vive en Member.projectId: asignar = actualizar miembros.
@@ -147,7 +148,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   )
 
   const metrics = useMemo<Metrics>(() => {
-    const today = new Date().toISOString().slice(0, 10)
     const open = tasks.filter((t) => t.status !== "Completado")
     return {
       totalProjects: projects.length,
@@ -155,7 +155,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       completedTasks: tasks.length - open.length,
       totalTasks: tasks.length,
       pendingTasks: open.length,
-      overdueTasks: open.filter((t) => t.dateline < today).length,
+      urgentTasks: open.filter((t) => t.priority === "Alta" || t.priority === "Urgente").length,
       activeMembers: members.filter((m) => m.isActive).length,
       totalMembers: members.length,
     }
