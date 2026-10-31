@@ -4,7 +4,7 @@ import { useState } from "react"
 import { CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -17,6 +17,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { FormAlert } from "@/components/FormAlert"
+import { SectionHeader } from "@/components/SectionHeader"
 import { isEmail } from "@/lib/date"
 import { useDashboard } from "@/lib/store"
 import type { Settings } from "@/lib/types"
@@ -49,36 +50,33 @@ export function SettingsTab() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configuración</CardTitle>
-        <CardDescription>Administra las preferencias de tu cuenta (simulado, se guarda en memoria)</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="grid max-w-2xl gap-6">
-          <FormAlert errors={errors} />
-          {saved && (
-            <Alert>
-              <CheckCircle2 />
-              <AlertTitle>Configuración guardada</AlertTitle>
-              <AlertDescription>Los cambios ya se aplican al dashboard.</AlertDescription>
-            </Alert>
-          )}
+    <form onSubmit={handleSubmit} className="mx-auto grid max-w-2xl gap-8">
+      <FormAlert errors={errors} />
+      {saved && (
+        <Alert className="animate-panel">
+          <CheckCircle2 />
+          <AlertTitle>Configuración guardada</AlertTitle>
+          <AlertDescription>Los cambios ya se aplican al dashboard.</AlertDescription>
+        </Alert>
+      )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="s-org">Nombre de la organización</Label>
-              <Input id="s-org" value={form.orgName} onChange={(e) => update("orgName", e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="s-email">Email de contacto</Label>
-              <Input
-                id="s-email"
-                type="email"
-                value={form.contactEmail}
-                onChange={(e) => update("contactEmail", e.target.value)}
-              />
-            </div>
+      <section>
+        <SectionHeader title="General" description="Datos de tu organización y cómo se ve el dashboard." />
+        <Card className="animate-tile gap-5 p-6">
+          <div className="grid gap-2">
+            <Label htmlFor="s-org">Nombre de la organización</Label>
+            <Input id="s-org" value={form.orgName} onChange={(e) => update("orgName", e.target.value)} />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="s-email">Email de contacto</Label>
+            <Input
+              id="s-email"
+              type="email"
+              value={form.contactEmail}
+              onChange={(e) => update("contactEmail", e.target.value)}
+            />
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="s-language">Idioma</Label>
               <Select value={form.language} onValueChange={(v) => update("language", v as Settings["language"])}>
@@ -108,18 +106,23 @@ export function SettingsTab() {
               </Select>
             </div>
           </div>
+        </Card>
+      </section>
 
-          <div className="grid gap-4">
+      <section>
+        <SectionHeader title="Notificaciones" description="Elige de qué quieres enterarte." />
+        <Card className="animate-tile gap-0 p-0" style={{ ["--i" as string]: 1 }}>
+          <div className="divide-y divide-hairline">
             <SwitchRow
               id="s-tasks"
-              label="Notificar nuevas tareas"
+              label="Nuevas tareas"
               description="Avisar cuando se asigne una tarea."
               checked={form.notifyTasks}
               onChange={(v) => update("notifyTasks", v)}
             />
             <SwitchRow
               id="s-mail"
-              label="Notificaciones por email"
+              label="Correo electrónico"
               description="Enviar un correo por cada cambio importante."
               checked={form.notifyEmail}
               onChange={(v) => update("notifyEmail", v)}
@@ -132,16 +135,16 @@ export function SettingsTab() {
               onChange={(v) => update("weeklyReport", v)}
             />
           </div>
+        </Card>
+      </section>
 
-          <div>
-            <Button type="submit" disabled={saving}>
-              {saving && <Spinner />}
-              Guardar configuración
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+      <div>
+        <Button type="submit" size="lg" disabled={saving}>
+          {saving && <Spinner />}
+          Guardar configuración
+        </Button>
+      </div>
+    </form>
   )
 }
 
@@ -153,10 +156,12 @@ function SwitchRow(props: {
   onChange: (value: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
-      <div className="space-y-1">
-        <Label htmlFor={props.id}>{props.label}</Label>
-        <p className="text-sm text-muted-foreground">{props.description}</p>
+    <div className="flex items-center justify-between gap-6 px-6 py-4">
+      <div>
+        <Label htmlFor={props.id} className="text-[15px]">
+          {props.label}
+        </Label>
+        <p className="mt-0.5 text-[13px] text-muted-foreground">{props.description}</p>
       </div>
       <Switch id={props.id} checked={props.checked} onCheckedChange={props.onChange} />
     </div>
