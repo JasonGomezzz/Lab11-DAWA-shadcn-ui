@@ -32,13 +32,13 @@ export function ConfirmDialog({ open, onOpenChange, title, description, onConfir
 
   return (
     <Dialog open={open} onOpenChange={(value) => !loading && onOpenChange(value)}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent showCloseButton={false} className="gap-5 text-center sm:max-w-[340px]">
+        <DialogHeader className="items-center text-center">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <Button type="button" variant="outline" disabled={loading} onClick={() => onOpenChange(false)}>
+        <DialogFooter className="grid grid-cols-2 gap-2 sm:flex-none">
+          <Button type="button" variant="secondary" disabled={loading} onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
           <Button type="button" variant="destructive" disabled={loading} onClick={handleConfirm}>

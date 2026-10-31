@@ -24,12 +24,12 @@ export function DatePicker({ id, value, onChange, placeholder = "Selecciona una 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button id={id} type="button" variant="outline" className="w-full justify-start font-normal">
+        <Button id={id} type="button" variant="secondary" className="h-11 w-full justify-start rounded-xl bg-muted px-3.5 text-[15px] font-normal hover:bg-[color-mix(in_srgb,var(--muted),var(--foreground)_4%)]">
           <CalendarIcon className="mr-2 h-4 w-4" />
           {selected ? formatDate(value) : <span className="text-muted-foreground">{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto rounded-2xl p-0" align="start">
         <Calendar
           mode="single"
           locale={es}

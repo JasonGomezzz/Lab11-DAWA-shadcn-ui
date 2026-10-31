@@ -1,6 +1,6 @@
 "use client"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { UserAvatar } from "@/components/UserAvatar"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/date"
 import { useDashboard } from "@/lib/store"
+import { priorityTone, projectStatusTone, taskStatusTone } from "@/lib/ui"
 import type { Project } from "@/lib/types"
 
 interface ProjectDetailsProps {
@@ -35,9 +36,9 @@ export function ProjectDetails({ project, open, onOpenChange }: ProjectDetailsPr
 
         <div className="grid gap-4 text-sm">
           <div className="flex flex-wrap gap-2">
-            <Badge>{project.status}</Badge>
+            <Badge variant={projectStatusTone[project.status]}>{project.status}</Badge>
             <Badge variant="secondary">{project.category}</Badge>
-            <Badge variant={project.priority === "Urgente" ? "destructive" : "outline"}>
+            <Badge variant={priorityTone[project.priority]}>
               Prioridad {project.priority}
             </Badge>
           </div>
@@ -52,7 +53,7 @@ export function ProjectDetails({ project, open, onOpenChange }: ProjectDetailsPr
               <span className="text-muted-foreground">Progreso (tareas completadas)</span>
               <span className="font-medium">{progress}%</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
               <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
             </div>
           </div>
@@ -65,9 +66,7 @@ export function ProjectDetails({ project, open, onOpenChange }: ProjectDetailsPr
               <div className="grid gap-2">
                 {team.map((m) => (
                   <div key={m.userId} className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>{m.name[0]}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar name={m.name} className="size-9" />
                     <div>
                       <p className="font-medium leading-none">{m.name}</p>
                       <p className="text-muted-foreground">{m.position}</p>
@@ -85,9 +84,9 @@ export function ProjectDetails({ project, open, onOpenChange }: ProjectDetailsPr
             ) : (
               <ul className="grid gap-2">
                 {projectTasks.map((t) => (
-                  <li key={t.id} className="flex items-center justify-between rounded-md border p-2">
+                  <li key={t.id} className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2.5">
                     <span>{t.description}</span>
-                    <Badge variant={t.status === "Completado" ? "default" : "outline"}>{t.status}</Badge>
+                    <Badge variant={taskStatusTone[t.status]}>{t.status}</Badge>
                   </li>
                 ))}
               </ul>
